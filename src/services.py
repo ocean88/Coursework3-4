@@ -1,23 +1,27 @@
-from src.utils import excel_reader
+import logging
+import os
+from typing import Any
+import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 
-def search_data(data, search_query):
-    results = []
-    for item in data:
-        for key, value in item.items():
-            if search_query.lower() in str(value).lower():
-                results.append(item)
-                break
-    return results
+def search_in_data(filename: str, search_data: str) -> Any:
+    """Получаем аргумент в виде xslx файла и возвращаем содержимое"""
+    try:
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        data_directory = os.path.join(current_directory, "..", "data")
+        file_path = os.path.join(data_directory, filename)
+        with open(file_path, "r", encoding="utf-8"):
+            data = pd.read_excel(file_path)
+            filtered_data = data[
+                (data["Описание"].str.contains(search_data, case=False))
+                | (data["Категория"].str.contains(search_data, case=False))
+            ]
 
-search_query = input("Enter search query: ")
+            json_data = filtered_data.to_json(orient="records",
+                                              force_ascii=False)
 
-results = search_data(excel_reader('operations.xls', ''), search_query)
-
-if results:
-    for result in results:
-        print(result)
-else:
-    print("No results found.")
-
-
+            return json_data
+    except FileNotFoundError:
+        return []
