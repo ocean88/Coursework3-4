@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 def excel_reader(filename: str, datetime_str: str) -> Any:
-    """Получаем аргумент виде xslx файла и возвращаем содержимое"""
+    """Получаем аргумент виде xslx файла и дату и возвращаем содержимое"""
     try:
         current_directory = os.path.dirname(os.path.abspath(__file__))
         data_directory = os.path.join(current_directory, "..", "data")

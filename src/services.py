@@ -21,7 +21,7 @@ def search_in_data(filename: str, search_data: str) -> Any:
 
             json_data = filtered_data.to_json(orient="records",
                                               force_ascii=False)
-
+            logger.info(f"Успешное выполнение функции")
             return json_data
     except FileNotFoundError:
         return []

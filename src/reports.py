@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def log(filename: Optional[str] = None) -> Callable:
+    """Декоратор логирования записывает результат функции в log файл"""
     def wrapper(func: Callable) -> Callable:
         @wraps(func)
         def inner(*args: Any, **kwargs: Any) -> Any:
@@ -48,6 +49,7 @@ def log(filename: Optional[str] = None) -> Callable:
 def filter_by_category(
     filename: str, search_data: str, date: Optional[str] = None
 ) -> Any:
+    """Функций получает xls файл, и слово по которому будет возвращаться результат"""
     try:
         current_directory = os.path.dirname(os.path.abspath(__file__))
         data_directory = os.path.join(current_directory, "..", "data")
@@ -72,7 +74,7 @@ def filter_by_category(
         ]
 
         json_data = filtered_data.to_json(orient="records", force_ascii=False)
-
+        logger.info(f"Успешно отработала функция")
         return json_data
 
     except FileNotFoundError:
