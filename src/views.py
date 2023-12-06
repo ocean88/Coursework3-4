@@ -40,7 +40,7 @@ def get_exchange_rate():
 
     result_usd = data_usd["rates"]
     result_eur = data_eur["rates"]
-    logger.info(f"Запрос курса валют")
+    logger.info("Запрос курса валют")
     return f"Курс доллара {result_usd}\nКурс Евро {result_eur}"
 
 
@@ -54,10 +54,9 @@ def get_stock_price(symbol: str, token: str) -> str:
         if response.status_code == 200:
             data = response.json()
             result = data["c"]
-            logger.info(f"Успешный запрос finhub")
+            logger.info("Успешный запрос finhub")
             return f"Стоимость акций {symbol} - {result}"
         else:
             return f"Запрос не удался код ошибки {response.status_code}"
     except Exception as e:
         return f"Ошибка: {e}"
-

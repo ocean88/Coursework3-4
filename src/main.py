@@ -11,7 +11,7 @@ logger = setup_logging()
 
 
 def get_combined_results():
-
+    """Сохранение результатов в JSON-файл"""
     token = os.environ.get('TOKEN')
 
     # Результаты функций
@@ -25,7 +25,7 @@ def get_combined_results():
         "MSFT_stock_price": get_stock_price("MSFT", token),
         "TSLA_stock_price": get_stock_price("TSLA", token),
         "search_results": search_in_data("operations.xls", "Сбербанк"),
-        "filtered_results": filter_by_category("operations.xls", "Связь", "16.09.2020")
+        "filtered_results": filter_by_category("operations.xls", "Связь", "16.09.2020").to_json()
     }
 
     with open("results.json", "w", encoding="utf-8") as f:
@@ -35,6 +35,4 @@ def get_combined_results():
     return json.dumps(results, ensure_ascii=False)
 
 
-# Пример использования
-combined_results = get_combined_results()
-print(combined_results)
+print(get_combined_results())

@@ -3,49 +3,35 @@ import pandas as pd
 from typing import Optional, Callable, Any
 import logging
 from functools import wraps
-import datetime
+import datetime, timedelta
 
 
 logger = logging.getLogger(__name__)
 
 
-def log(filename: Optional[str] = None) -> Callable:
-    """Декоратор логирования записывает результат функции в log файл"""
+def report(*, filename: str = "report.xlsx") -> Callable:
+    """Записывает в файл результат, который возвращает функция, формирующая отчет"""
+
     def wrapper(func: Callable) -> Callable:
         @wraps(func)
-        def inner(*args: Any, **kwargs: Any) -> Any:
+        def inner(*args: Optional[Any], **kwargs: Optional[Any]) -> Optional[Any]:
             try:
-                now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 result = func(*args, **kwargs)
-
-                if filename:
-                    with open(filename, "a", encoding="UTF-8") as file:
-                        file.write(f"{now} {func.__name__} ok\n")
-                        file.write(f"{result}\n")
+                if filename.endswith(".xlsx"):
+                    result.to_excel(filename, index=False)
                 else:
-                    print(f"{now} {func.__name__} ok")
-                    print(f"Result: {result}")
-                return result
-            except Exception as e:
-                now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                inputs = f"Inputs: {args}, {kwargs}"
-                error_message = f"{func.__name__}: {str(e)}"
-                log_message = (
-                    f"{now} {func.__name__} error: " f"{error_message}. {inputs}\n"
-                )
-                if filename:
-                    with open(filename, "a") as file:
-                        file.write(log_message + "\n")
-                else:
-                    print(log_message)
-                raise e
+                    raise ValueError("Файл некорректного формата")
+            except Exception:
+                logger.info("Что то пошло не так")
+                result = None
+            return result
 
         return inner
 
     return wrapper
 
 
-@log(filename="mylog.txt")
+@report()
 def filter_by_category(
     filename: str, search_data: str, date: Optional[str] = None
 ) -> Any:
@@ -54,14 +40,12 @@ def filter_by_category(
         current_directory = os.path.dirname(os.path.abspath(__file__))
         data_directory = os.path.join(current_directory, "..", "data")
         file_path = os.path.join(data_directory, filename)
-
         data = pd.read_excel(file_path)
-
         data["Категория"] = data["Категория"].fillna("")
         data["Дата платежа"] = pd.to_datetime(data["Дата платежа"], dayfirst=True)
 
         if date is None:
-            date = pd.to_datetime(datetime.datetime.now(), dayfirst=True)
+            date = pd.to_datetime(datetime.now(), dayfirst=True)
         else:
             date = pd.to_datetime(date, dayfirst=True)
 
@@ -72,10 +56,8 @@ def filter_by_category(
             & (data["Дата платежа"] >= three_months_ago)
             & (data["Дата платежа"] <= date)
         ]
-
-        json_data = filtered_data.to_json(orient="records", force_ascii=False)
-        logger.info(f"Успешно отработала функция")
-        return json_data
+        logger.info("Успешно отработала функция")
+        return filtered_data
 
     except FileNotFoundError:
         return []

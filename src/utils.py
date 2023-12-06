@@ -41,7 +41,7 @@ def excel_reader(filename: str, datetime_str: str) -> Any:
             top_5 = current_month_operations.sort_values(
                 by="Сумма платежа", ascending=False
             ).head(5)
-            logger.info(f"Удалось открыть xls ура.")
+            logger.info("Удалось открыть xls ура.")
             return (f"Операции за текущий месяц {datetime_str}:\n{current_month_operations}"
                     f"\nСумма операции каждой 'Номер карты':\n{sum_by_card}"
                     f"\n Топ-5 транзакций за месяц{top_5} \nКэшбэк {cashback}")
